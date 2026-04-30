@@ -24,4 +24,6 @@ dependencies = [
     # Tool
     "wikipedia>=1.4.0",
     "duckduckgo-search>=8.1.1",
+    "fastapi>=0.136.1",
+    "uvicorn>=0.42.0",
 ]

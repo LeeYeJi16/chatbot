@@ -28,13 +28,16 @@ client = OpenAI(api_key=api_key)
 def search_restaurants(query: str) -> str:
     """DuckDuckGo로 맛집을 검색합니다."""
     try:
-        results = DDGS().text(f"{query} 맛집 추천", max_results=5)
+        results = DDGS().text(f"{query} 맛집 추천 후기 메뉴 가격 영업시간", max_results=10)
         if not results:
             return "검색 결과가 없습니다."
 
         search_text = ""
-        for r in results:
-            search_text += f"- {r['title']}: {r['body']}\n"
+        for i, r in enumerate(top_results, 1):
+            search_text += f"{i}. {r['title']}\n"
+            search_text += f"   {r['body']}\n"
+            search_text += f"   {r['href']}\n\n"
+
         return search_text
     except Exception as e:
         return f"검색 중 오류: {str(e)}"
@@ -87,6 +90,12 @@ SYSTEM_PROMPT = """너는 친절한 맛집 추천 전문가야.
 
 4. 검색 결과가 부족하면 솔직하게 말하고, 다른 검색어로 재검색해
 5. 추천 후 "다른 조건으로 다시 찾아드릴까요?" 물어봐
+6. 정보가 부족해도 바로 답변 가능한 범위부터 답한다.
+7. 재질문은 꼭 필요한 경우에만 1개만 한다.
+8. 재질문하기 전에 사용자가 원하는 의도를 합리적으로 추정한다.
+9. 답변은 결론 → 근거 → 추가 확인사항 순서로 작성한다.
+10. 제품명, 증상, 조건이 일부 빠져도 일반적인 기준으로 먼저 안내한다.
+11. 모르는 내용은 지어내지 말고 "확인 필요"라고 말한다.
 
 ## 대화 스타일
 - 친근하고 편안한 말투
@@ -103,7 +112,7 @@ def process_with_tools(messages):
         model="gpt-4.1-nano",
         messages=messages,
         tools=tools,
-        temperature=0.7,
+        temperature=0.2,
     )
 
     assistant_message = response.choices[0].message
@@ -134,7 +143,7 @@ def process_with_tools(messages):
     final_response = client.chat.completions.create(
         model="gpt-4.1-nano",
         messages=messages,
-        temperature=0.7,
+        temperature=0.2,
         stream=True,
     )
 

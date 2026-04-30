@@ -33,7 +33,7 @@ if "messages" not in st.session_state:
 
 # UI
 st.title("ChatGPT 상담 챗봇")
-st.caption("OpenAI API를 이용한 멀티턴 대화 예제")
+st.caption("OpenAI API를 이용해 상담을 도와드립니다")
 
 # 기존 메시지 출력
 for msg in st.session_state.messages:
